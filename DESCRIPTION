@@ -1,0 +1,20 @@
+Package: sousrir
+Title: Search On Untranscribed Speech Rapidly In R
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Nay",
+           family = "San",
+           role = c("aut", "cre"),
+           email = "nay.san@stanford.edu",
+           comment = c(ORCID = "0000-0002-3533-5025"))
+Description: Spoken term detection with Dynamic Time Warping
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports:
+    dtw (>= 1.21),
+    furrr (>= 0.2.2),
+    IncDTW (>= 1.1.4.2),
+    reticulate (>= 1.16)
