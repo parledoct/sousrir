@@ -20,19 +20,23 @@ create_allcomb_df <- function(query_names, reference_names) {
 #' Create results data frame
 #'
 #' @param search_mf Search manifest with pairs of query and references searched
-#' @param search_scores Numeric vector of scores returned by DTW search
+#' @param search_results Matrix of scores, start and end indices returned by DTW search
 #'
 #' @return
 #' A data frame with columns 'query', 'reference', and 'score'
 
 #' @export
-create_qbestd_df <- function(search_mf, search_scores) {
+create_qbestd_df <- function(search_mf, search_results) {
 
-  search_mf$score <- search_scores
+  return_df <- cbind(
+    search_mf,
+    search_results,
+    stringsAsFactors = FALSE
+  )
 
-  df_ordered <- search_mf[order(search_mf$query, -search_mf$score), ]
-  rownames(df_ordered) <- 1:nrow(df_ordered)
+  return_df <- return_df[order(return_df$query, -return_df$score), ]
+  rownames(return_df) <- 1:nrow(return_df)
 
-  df_ordered
+  return_df
 
 }

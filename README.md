@@ -8,7 +8,7 @@ Pronounced 'soo-rear' (like the French *sourire* 'to smile').
 
 #### 1.1 R package 
 
-Use the `install_github` function from the remotes package to install this development version of the R package. We will put a version on CRAN once the package functionality has stabilized.
+Use the `install_github` function from the remotes package to install this development version of the R package. We will put a version on CRAN once the package functionality has stabilised.
 
 ```r
 # Install remotes package if you don't have it
@@ -19,7 +19,7 @@ remotes::install_github("parledoct/sousrir")
 
 #### 1.2 Miniconda
 
-If you do not already have an installation of miniconda for use by R, use the `install_miniconda()` function from the reticulate package (which is a dependency of sousrir, and will be automatically installed). The reticulate package lets you use Python functions and data structures in R, and needs access to its own (clean) install of miniconda.
+If you do not already have an installation of Miniconda for use by R, use the `install_miniconda()` function from the reticulate package (which is a dependency of sousrir, and will be automatically installed). The reticulate package lets you use Python functions and data structures in R, and needs access to its own (clean) installation of Miniconda.
 
 ```r
 reticulate::install_miniconda()
@@ -58,14 +58,28 @@ results_df <- qbe_std(
 )
 ```
 
-By default, this call will result in a data frame as the one shown below where for each pair of query and reference there is a score of how likely the query occurs reference (higher is more likely):
+By default, this call will result in a data frame as the one shown below where for each pair of query and reference there is a score of how likely the query occurs reference (higher is more likely), and the start and end indices of the region in the reference that was most similar to the query:
 
-| query |        reference      | score |
-|-------|-----------------------|-------|
-| ED_aapmoal | OV-aapmoal-verschillend-mor-<b>aapmoal</b>-prachteg-van-kleur |   0.7463992   |
-| ED_aapmoal | RB-de-gruinteboer-staait-mit-n-blaauw-schoet-veur-achter-de-teunbaank        |   0.6739399   |
-|  ED_achter  | OV-aapmoal-verschillend-mor-aapmoal-prachteg-van-kleur |   0.7209738   |
-|  ED_achter  | RB-de-gruinteboer-staait-mit-n-blaauw-schoet-veur-<b>achter</b>-de-teunbaank        |   0.7986339 |
+| query |        reference      | score | match_start | match_end |
+|-------|-----------------------|-------|------|------| 
+| ED_aapmoal | OV-<b>aapmoal</b>-verschillend-mor-aapmoal-prachteg-van-kleur |   0.7463992   | 5 | 32 |
+| ED_aapmoal | RB-de-gruinteboer-staait-mit-n-blaauw-schoet-veur-achter-de-teunbaank        |   0.6739399   | 60 | 93 |
+|  ED_achter  | OV-aapmoal-verschillend-mor-aapmoal-prachteg-van-kleur |   0.7209738   | 108 | 130 |
+|  ED_achter  | RB-de-gruinteboer-staait-mit-n-blaauw-schoet-veur-<b>achter</b>-de-teunbaank        |   0.7986339 | 92 | 108 |
+
+We intentionally do not convert the time frame indices into seconds by default, because the conversion process is highly dependent on how you originally extracted the features. In the case of gos-kdl, we extracted features from audio sampled at 16 kHz (16000 samples per second) using the default parameters of the [librosa.feature.mfcc](https://librosa.org/doc/main/generated/librosa.feature.mfcc.html) function (`hop_length`: 512 samples per step). If you know these parameters, you can use the `samp2sec_libmfcc` function to convert the time frame indices into seconds:
+
+```r
+results_df$match_start <- samp2sec_libmfcc(results_df$match_start, 16000, 512)
+results_df$match_end   <- samp2sec_libmfcc(results_df$match_end, 16000, 512)
+```
+
+| query |        reference      | score | match_start | match_end |
+|-------|-----------------------|-------|------|------| 
+| ED_aapmoal | OV-<b>aapmoal</b>-verschillend-mor-aapmoal-prachteg-van-kleur |   0.7463992   | 0.160 | 1.024 |
+| ED_aapmoal | RB-de-gruinteboer-staait-mit-n-blaauw-schoet-veur-achter-de-teunbaank        |   0.6739399   | 1.920 | 2.976 |
+|  ED_achter  | OV-aapmoal-verschillend-mor-aapmoal-prachteg-van-kleur |   0.7209738   | 3.456 | 4.16 |
+|  ED_achter  | RB-de-gruinteboer-staait-mit-n-blaauw-schoet-veur-<b>achter</b>-de-teunbaank        |   0.7986339 | 2.944 | 3.456 |
 
 ### 3. Advanced usage: Bring your own features and functions (BYOFs)
 
@@ -158,28 +172,32 @@ If you want to subset the queries or references on which the search is performed
 
 By default, we return a data frame of the form: 
 
-| query |        reference      | score |
-|-------|-----------------------|-------|
-| ED_aapmoal | OV-aapmoal-verschillend-mor-<b>aapmoal</b>-prachteg-van-kleur |   0.7463992   |
-| ED_aapmoal | RB-de-gruinteboer-staait-mit-n-blaauw-schoet-veur-achter-de-teunbaank        |   0.6739399   |
-|  ED_achter  | OV-aapmoal-verschillend-mor-aapmoal-prachteg-van-kleur |   0.7209738   |
-|  ED_achter  | RB-de-gruinteboer-staait-mit-n-blaauw-schoet-veur-<b>achter</b>-de-teunbaank        |   0.7986339 |
+| query |        reference      | score | match_start | match_end |
+|-------|-----------------------|-------|------|------| 
+| ED_aapmoal | OV-<b>aapmoal</b>-verschillend-mor-aapmoal-prachteg-van-kleur |   0.7463992   | 5 | 32 |
+| ED_aapmoal | RB-de-gruinteboer-staait-mit-n-blaauw-schoet-veur-achter-de-teunbaank        |   0.6739399   | 60 | 93 |
+|  ED_achter  | OV-aapmoal-verschillend-mor-aapmoal-prachteg-van-kleur |   0.7209738   | 108 | 130 |
+|  ED_achter  | RB-de-gruinteboer-staait-mit-n-blaauw-schoet-veur-<b>achter</b>-de-teunbaank        |   0.7986339 | 92 | 108 |
 
 Using the `create_qbestd_df` post-processor function:
 
 ```r
-create_qbestd_df <- function(search_mf, search_scores) {
+create_qbestd_df <- function(search_mf, search_results) {
 
-  # Append score column
-  search_mf$score <- search_scores
+  # Combine search manifest and search results
+  return_df <- cbind(
+    search_mf,
+    search_results,
+    stringsAsFactors = FALSE
+  )
 
-  # Sort by query and then score (descending)
-  df_ordered <- search_mf[order(search_mf$query, -search_mf$score), ]
+  # Sort by query (ascending) and then score (descending)
+  return_df <- return_df[order(return_df$query, -return_df$score), ]
   
-  # Reset row names
-  rownames(df_ordered) <- 1:nrow(df_ordered)
+  # Reset row names after sort
+  rownames(return_df) <- 1:nrow(return_df)
 
-  df_ordered
+  return_df
 
 }
 ```
@@ -188,7 +206,7 @@ If you want to generate a form of the results that works most readily with whate
 
 #### 3.5 Use your own DTW search functions
 
-The primary reason this package is written in R instead of python is because we rely heavily on the IncDTW R package to shortlist the best location(s) to do full DTW searches on, which are computationally expensive over a large search manifest.
+The primary reason this package is written in R instead of Python is because we rely heavily on the IncDTW R package to shortlist the best location(s) to do full DTW comparisons on, which are computationally expensive over a large search manifest.
 
 While the IncDTW R package helps with shortlisting, its other DTW-related functionality is relatively limited compared to the `dtw` package (which has both R and Python versions). For example, as of April 2021, the `IncDTW` package does not implement the `SymmetricP1` step function ([Sakoe & Chiba, 1978](https://doi.org/10.1109/TASSP.1978.1163055)). So we shortlist the top match using the `rundtw` function from the IncDTW package and then calculate a score for that top match using the `dtw` function from the dtw package.
 
@@ -223,3 +241,24 @@ In brief, the default `sousrir_ssdtw` function takes a starting index provided b
 - `distnorm_func` Function to normalise computed distances (default: `norm_rf2014`; using procedure from [Rodriguez-Fuentes et al., 2014](https://doi.org/10.1109/ICASSP.2014.6855122))
 
 Of course, you're always welcome to write your own scoring function. For the full implementation of the `sousrir_ssdtw` function, see the `R/dtw_helpers.R` file in this repository.
+
+#### 3.6 Extras: plot distance matrix and DTW alignment
+
+If you want to plot QbE-STD results and you have the tidyverse set of packages installed (e.g. dplyr, tidyr, ggplot2, stringr, etc.), you can load a helper function included in the sousrir package:
+
+```r
+# Load plot_qbe_std function
+
+source(system.file("extras", "plot_qbe_std.R", package="sousrir"))
+```
+
+This function is not included as the regular set of functions because of it depends on many tidyverse packages to do various wrangling and plotting operations. I assume if you're interested in this level of detail, you are an experienced R developer who does have these packages. But the plotting functionality is not needed for headless deployment, so I have not listed these big packages (e.g. dplyr) as dependencies for sousrir.
+
+```r
+query_feats <- fetch_npz_item(gos_kdl_queries, "ED_achter")
+ref_feats   <- fetch_npz_item(gos_kdl_refs, "RB-de-gruinteboer-staait-mit-n-blaauw-schoet-veur-achter-de-teunbaank")
+
+plot_qbe_std(query_feats, ref_feats)
+```
+
+![](https://user-images.githubusercontent.com/9938298/114621706-e3a60080-9c61-11eb-9a8e-9a6001c2b856.png)

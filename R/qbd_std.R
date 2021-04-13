@@ -33,7 +33,7 @@ qbe_std <- function(
     future::plan(future::multisession)
   }
 
-  search_dists    <- furrr::future_map2_dbl(
+  search_results  <- furrr::future_map2_dfr(
     .x = search_mf$query,
     .y = search_mf$reference,
     function(query_name, ref_name) {
@@ -88,6 +88,6 @@ qbe_std <- function(
     .options = furrr::furrr_options(seed = TRUE)
   )
 
-  post_processor(search_mf, search_dists)
+  post_processor(search_mf, search_results)
 
 }

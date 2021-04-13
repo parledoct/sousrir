@@ -13,7 +13,8 @@ sousrir_ssdtw(
   min_match_ratio = 0.5,
   max_match_ratio = 2,
   distance_func = dist_stdeuc,
-  distnorm_func = norm_rf2014
+  distnorm_func = norm_rf2014,
+  return_dtwalign = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ sousrir_ssdtw(
 \item{distance_func}{Function to compute distances between query and reference (default: \link{dist_stdeuc})}
 
 \item{distnorm_func}{Function to normalize computed distances (default: \link{norm_rf2014})}
+
+\item{return_dtwalign}{Whether or not to return alignment object (i.e. for plotting alignment)}
 }
 \value{
 A numeric score of how likely the query occurs in the reference (or NA if no acceptable alignment was found given the parameters)

@@ -6,6 +6,7 @@
 #' @return
 #' An integer indicating the start of the best match for the query within the reference
 
+#' @export
 sousrir_1nndtw <- function(query_feats, ref_feats) {
 
   IncDTW::rundtw(
@@ -32,10 +33,12 @@ sousrir_1nndtw <- function(query_feats, ref_feats) {
 #' @param max_match_ratio Maximum match length as ratio of query (default: 2.0 = twice the query size)
 #' @param distance_func Function to compute distances between query and reference (default: \link{dist_stdeuc})
 #' @param distnorm_func Function to normalize computed distances (default: \link{norm_rf2014})
+#' @param return_dtwalign Whether or not to return alignment object (i.e. for plotting alignment)
 #'
 #' @return
 #' A numeric score of how likely the query occurs in the reference (or NA if no acceptable alignment was found given the parameters)
 
+#' @export
 sousrir_ssdtw <- function(
   query_name,
   ref_name,
@@ -45,7 +48,8 @@ sousrir_ssdtw <- function(
   min_match_ratio = 0.5,
   max_match_ratio = 2.0,
   distance_func   = dist_stdeuc,
-  distnorm_func   = norm_rf2014) {
+  distnorm_func   = norm_rf2014,
+  return_dtwalign = FALSE) {
 
   # Calculate distance matrix
   qr_dists <- tryCatch(
@@ -99,7 +103,7 @@ sousrir_ssdtw <- function(
       dtw::dtw(
         x = subseq_dists,
         step.pattern = dtw::symmetricP1,
-        distance.only = TRUE,
+        distance.only = !return_dtwalign,
         open.end = TRUE
       )},
     error = function(cond) {
@@ -107,17 +111,29 @@ sousrir_ssdtw <- function(
     }
   )
 
+  if(return_dtwalign) {
+    return(dtw_align)
+  }
+
   match_ratio <- dtw_align$jmin / q_length
 
   if(is.null(dtw_align) | match_ratio < min_match_ratio) {
 
     # Return NA if no alignment can be found
     # or if alignment is less than the minimum match length
-    NA
+    list(
+      score       = NA,
+      match_start = NA,
+      match_end   = NA
+    )
 
   } else {
 
-    1 - dtw_align$normalizedDistance
+    list(
+      score       = 1 - dtw_align$normalizedDistance,
+      match_start = top_match_start,
+      match_end   = top_match_start + dtw_align$jmin
+    )
 
   }
 

@@ -4,12 +4,12 @@
 \alias{create_qbestd_df}
 \title{Create results data frame}
 \usage{
-create_qbestd_df(search_mf, search_scores)
+create_qbestd_df(search_mf, search_results)
 }
 \arguments{
 \item{search_mf}{Search manifest with pairs of query and references searched}
 
-\item{search_scores}{Numeric vector of scores returned by DTW search}
+\item{search_results}{Matrix of scores, start and end indices returned by DTW search}
 }
 \value{
 A data frame with columns 'query', 'reference', and 'score'
