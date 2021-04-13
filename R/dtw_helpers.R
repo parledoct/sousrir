@@ -99,7 +99,7 @@ sousrir_ssdtw <- function(
       dtw::dtw(
         x = subseq_dists,
         step.pattern = dtw::symmetricP1,
-        # distance.only = TRUE,
+        distance.only = TRUE,
         open.end = TRUE
       )},
     error = function(cond) {
