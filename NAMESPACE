@@ -3,3 +3,4 @@
 export(fetch_npz_item)
 export(fetch_npz_names)
 export(qbe_std)
+export(test_miniconda_ok)

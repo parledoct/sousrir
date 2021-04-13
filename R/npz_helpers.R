@@ -28,3 +28,20 @@ fetch_npz_item <- function(npz_file, item_name) {
 
   np$load(npz_file)$f[[item_name]]
 }
+
+# Test miniconda installation
+
+#' @export
+test_miniconda_ok <- function() {
+
+  gos_kdl_queries <- system.file("extdata", "gos-kdl_queries.npz", package="sousrir")
+
+  query_names     <- fetch_npz_names(gos_kdl_queries)
+
+  if(query_names[1] != "ED_warren") {
+    stop("Unable to fetch filenames from gos-kdl_queries.npz file.")
+  } else {
+    message("Miniconda installation seems OK!")
+  }
+
+}
