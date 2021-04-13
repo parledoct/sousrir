@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "nay.san@stanford.edu",
            comment = c(ORCID = "0000-0002-3533-5025"))
-Description: Spoken term detection with Dynamic Time Warping
+Description: Spoken term detection with Dynamic Time Warping.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -16,8 +16,10 @@ RoxygenNote: 7.1.1
 Imports:
     dtw (>= 1.21),
     furrr (>= 0.2.2),
+    future,
     glue (>= 1.4.2),
     IncDTW (>= 1.1.4.2),
+    proxy (>= 0.4),
     reticulate (>= 1.16)
 Suggests: 
     testthat (>= 3.0.0)

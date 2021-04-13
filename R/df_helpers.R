@@ -6,6 +6,7 @@
 #' @return
 #' A data frame with columns 'query' and 'reference' where each row is a unique pairing of a query and a reference
 
+#' @export
 create_allcomb_df <- function(query_names, reference_names) {
 
   expand.grid(
@@ -24,6 +25,7 @@ create_allcomb_df <- function(query_names, reference_names) {
 #' @return
 #' A data frame with columns 'query', 'reference', and 'score'
 
+#' @export
 create_qbestd_df <- function(search_mf, search_scores) {
 
   search_mf$score <- search_scores

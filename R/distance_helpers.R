@@ -6,6 +6,7 @@
 #' @return
 #' A distance matrix with M rows and N columns
 
+#' @export
 dist_stdeuc <- function(query_feats, ref_feats) {
 
   proxy::dist(
@@ -25,6 +26,7 @@ dist_stdeuc <- function(query_feats, ref_feats) {
 #' @return
 #' A normalized distance matrix
 
+#' @export
 norm_rf2014 <- function(qr_dists) {
 
   min_i  <- apply(qr_dists, MARGIN = 1, FUN = min)
