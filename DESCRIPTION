@@ -16,5 +16,6 @@ RoxygenNote: 7.1.1
 Imports:
     dtw (>= 1.21),
     furrr (>= 0.2.2),
+    glue (>= 1.4.2),
     IncDTW (>= 1.1.4.2),
     reticulate (>= 1.16)
