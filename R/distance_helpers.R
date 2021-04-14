@@ -1,4 +1,4 @@
-#' Calculate standardized Euclidean distances as done in NumPy cdist
+#' Calculate standardized Euclidean distances as done in SciPy cdist
 #'
 #' @param query_feats Feature matrix for query, of shape M rows and F columns
 #' @param ref_feats Feature matrix for reference, of shape N rows and F columns
@@ -7,23 +7,45 @@
 #' A distance matrix with M rows and N columns
 
 #' @export
-dist_npstdeuc <- function(query_feats, ref_feats) {
+dist_scipy_stdeuc <- function(query_feats, ref_feats) {
+
+  # Vectorized version of Euclidean distance, inspired by
+  # https://github.com/cran/pracma/blob/master/R/distmat.R
+  #
+  # (x - y)^2 = x^2 + y^2 - 2xy
+
+  # SciPy standardized Euclidean distance from cdist:
+  # https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html
+  #
+  # (x - y)^2/V = x^2/V + y^2/V - 2xy/V
 
   q_length  <- nrow(query_feats)
   r_length  <- nrow(ref_feats)
 
+  # Get column variances the same way as SciPy
+  # The variance vector for standardized Euclidean.
+  # Default: np.var(np.vstack([XA, XB]), axis=0, ddof=1)
+  #
+  # Multiply by ((r_length - 1) / r_length) to get population variance
+  # since R's default is sample variance
   stacked_l <- q_length + r_length
   V <- matrixStats::colVars(rbind(query_feats, ref_feats)) * ((r_length - 1) / r_length)
 
-  dists <- matrix(nrow = q_length, ncol = r_length)
+  # x^2/V, vector of q_length
+  std_q2  <- apply(sweep(query_feats^2, MARGIN = 2, STATS = V, FUN = "/"), MARGIN = 1, sum)
 
-  for (i in 1:nrow(query_feats)) {
-    for (j in 1:nrow(ref_feats)) {
-      dists[i, j] <- sqrt(sum((query_feats[i, ] - ref_feats[j, ])^2 / V))
-    }
-  }
+  # y^2/V, vector of r_length
+  std_r2  <- apply(sweep(ref_feats^2, MARGIN = 2, STATS = V, FUN = "/"), MARGIN = 1, sum)
 
-  dists
+  # 2xy/V, matrix of q_length x r_length
+  std_qr <- sweep(query_feats, MARGIN = 2, STATS = V, FUN = "/") %*% t(ref_feats)
+
+  # Cast x^2/V and y^2/V into matrices of q_length x r_length
+  q2_mat <- matrix(rep(std_q2, r_length), q_length, r_length, byrow=FALSE)
+  r2_mat <- matrix(rep(std_r2, q_length), q_length, r_length, byrow=TRUE)
+
+  # Return Euclidean distance: sqrt(x^2/V + y^2/V - 2xy/V)
+  sqrt(pmax(q2_mat + r2_mat - 2*std_qr, 0))
 
 }
 

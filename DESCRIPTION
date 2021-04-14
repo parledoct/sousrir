@@ -19,8 +19,10 @@ Imports:
     future,
     glue (>= 1.4.2),
     IncDTW (>= 1.1.4.2),
+    matrixStats (>= 0.58.0),
     proxy (>= 0.4),
-    reticulate (>= 1.16)
+    reticulate (>= 1.16),
+    retry (>= 0.1.0)
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

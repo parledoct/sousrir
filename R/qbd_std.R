@@ -39,7 +39,11 @@ qbe_std <- function(
     function(query_name, ref_name) {
 
       query_feats <- tryCatch(
-        expr  = features_fetcher(queries_loc, query_name),
+        expr  = retry::retry(
+          expr = features_fetcher(queries_loc, query_name),
+          until = ~ is.matrix(.),
+          max_tries = 5
+        ),
         error = function(cond) {
           stop(
             glue::glue("Error: could not fetch features for query '{query_name}'.")
@@ -48,18 +52,20 @@ qbe_std <- function(
       )
 
       ref_feats <- tryCatch(
-        expr  = features_fetcher(references_loc, ref_name),
+        expr  = retry::retry(
+          expr = features_fetcher(references_loc, ref_name),
+          until = ~ is.matrix(.),
+          max_tries = 5
+        ),
         error = function(cond) {
-          stop(
-            glue::glue("Error: could not fetch features for reference '{ref_name}'.")
-          )
+          message(glue::glue("Error: could not fetch features for reference '{ref_name}'."))
+          stop(cond)
         }
       )
 
       if(ncol(query_feats) != ncol(ref_feats)) {
-        stop(
-          glue::glue("Error: Different number of feature columns between query '{query_name}' and reference '{ref_name}'.")
-        )
+        message(glue::glue("Error: Different number of feature columns between query '{query_name}' and reference '{ref_name}'."))
+        stop(cond)
       }
 
       top_match_starts <- tryCatch(

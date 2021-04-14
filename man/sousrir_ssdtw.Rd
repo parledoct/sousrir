@@ -12,7 +12,7 @@ sousrir_ssdtw(
   top_match_start,
   min_match_ratio = 0.5,
   max_match_ratio = 2,
-  distance_func = dist_stdeuc,
+  distance_func = dist_scipy_stdeuc,
   distnorm_func = norm_rf2014,
   return_dtwalign = FALSE
 )
