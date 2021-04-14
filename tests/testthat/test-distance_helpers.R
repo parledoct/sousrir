@@ -15,7 +15,7 @@ test_that("Calculating standardised Euclidean distances works", {
   # There should only be 2 unique values when calculating a
   # standardised Euclidean distance between the query and itself
   expect_equal(
-    unique(dist_stdeuc(query, query)),
+    unique(round(dist_stdeuc(query, query), 8)),
     c(0.00000000, 2.44948974)
   )
 
