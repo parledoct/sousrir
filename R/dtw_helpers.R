@@ -9,16 +9,27 @@
 #' @export
 sousrir_1nndtw <- function(query_feats, ref_feats) {
 
-  IncDTW::rundtw(
-    Q = query_feats,
-    C = ref_feats,
-    dist_method = 'norm2',
-    step_pattern = 'symmetric2',
-    scale = '01',
-    ws = 5,
-    lower_bound = TRUE,
-    k = 1
-  )$knn_indices[1]
+  if(nrow(ref_feats) >= nrow(query_feats)) {
+
+    IncDTW::rundtw(
+      Q = query_feats,
+      C = ref_feats,
+      dist_method = 'norm2',
+      step_pattern = 'symmetric2',
+      scale = '01',
+      ws = 5,
+      lower_bound = TRUE,
+      k = 1
+    )$knn_indices[1]
+
+  } else {
+
+    # IncDTW::rundtw does not work if reference happens to be
+    # shorter than the query. Return index of 1 so sousrir_ssdtw
+    # can try matching entire reference against query
+    1
+
+  }
 
 }
 
@@ -50,6 +61,17 @@ sousrir_ssdtw <- function(
   distance_func   = dist_stdeuc,
   distnorm_func   = norm_rf2014,
   return_dtwalign = FALSE) {
+
+  na_list <- list(
+    score       = NA,
+    match_start = NA,
+    match_end   = NA
+  )
+
+  if(top_match_start == -1) {
+    # Return NA result if no matches found by sousrir_1nndtw
+    return(na_list)
+  }
 
   # Calculate distance matrix
   qr_dists <- tryCatch(
@@ -115,17 +137,18 @@ sousrir_ssdtw <- function(
     return(dtw_align)
   }
 
+  if(is.null(dtw_align)) {
+    # Return NA list if no alignment found
+    return(na_list)
+  }
+
   match_ratio <- dtw_align$jmin / q_length
 
-  if(is.null(dtw_align) | match_ratio < min_match_ratio) {
+  if(match_ratio < min_match_ratio) {
 
-    # Return NA if no alignment can be found
-    # or if alignment is less than the minimum match length
-    list(
-      score       = NA,
-      match_start = NA,
-      match_end   = NA
-    )
+    # Return NA list if match is smaller than
+    # minimum match length
+    return(na_list)
 
   } else {
 

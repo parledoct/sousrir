@@ -72,8 +72,8 @@ qbe_std <- function(
 
       if(all(is.na(top_match_starts))) {
 
-        # If all NA (no good matches then return 0)
-        return(NA)
+        # If no good matches, then let ssdtw_func know to return a null result
+        ssdtw_func(query_name, ref_name, query_feats, ref_feats, -1)
 
       } else {
 
