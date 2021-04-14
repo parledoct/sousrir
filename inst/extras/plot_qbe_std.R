@@ -2,7 +2,7 @@ library(tidyverse)
 
 plot_qbe_std <- function(query_feats, ref_feats, dist) {
 
-  qr_dists <- dist_stdeuc(query_feats, ref_feats)
+  qr_dists <- dist_npstdeuc(query_feats, ref_feats)
   qr_dists <- norm_rf2014(qr_dists)
 
   dists_df <- t(qr_dists) %>%

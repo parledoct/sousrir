@@ -2,6 +2,7 @@
 
 export(create_allcomb_df)
 export(create_qbestd_df)
+export(dist_npstdeuc)
 export(dist_stdeuc)
 export(fetch_npz_item)
 export(fetch_npz_names)
